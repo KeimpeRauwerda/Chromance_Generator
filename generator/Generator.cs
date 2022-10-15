@@ -11,17 +11,19 @@ public class HexagonGrid
     private float maxWidth;
     private float maxHeight;
 
-    private float hubOuterWidth = 5;
-    private float hubInnerWidth = 3;
+    private float hubOuterWidth;
+    private float hubInnerWidth;
+    private float hubDiameter;
     
     private float profileLength;
+    private float profileWidth;
     private float oddWidthOffset;
 
     public int gridWidth;
     public int gridHeight;
     private int[,] grid;
 
-    public HexagonGrid(Graphics GFX, int offsetX, int offsetY, float maxWidth, float maxHeight, float profileLength = 25)
+    public HexagonGrid(Graphics GFX, int offsetX, int offsetY, float maxWidth, float maxHeight, float profileLength = 25, float profileWidth = 1.7f)
     {
         this.GFX = GFX;
         this.offsetX = offsetX;
@@ -29,7 +31,12 @@ public class HexagonGrid
         this.maxWidth = maxWidth;
         this.maxHeight = maxHeight;
 
+        this.hubOuterWidth = 5;
+        this.hubInnerWidth = 3;
+        this.hubDiameter = (float)(this.hubOuterWidth / Math.Sqrt(3) * 2);
+
         this.profileLength = profileLength;
+        this.profileWidth = profileWidth;
 
         this.oddWidthOffset = (profileLength + hubInnerWidth) / 2;
 
@@ -41,47 +48,66 @@ public class HexagonGrid
 
     public int CalculateGridWidth(float maxWidth, float profileLength, float hubInnerWidth, float hubOuterWidth, float oddWidthOffset) {
         double hexagonWidth = profileLength + hubInnerWidth;
-        return (int)((maxWidth - hubOuterWidth - oddWidthOffset) / hexagonWidth);
+        return 1 + (int)((maxWidth - hubOuterWidth - oddWidthOffset) / hexagonWidth);
     }
 
     public int CalculateGridHeight(float maxHeight, float profileLength, float hubInnerWidth, float hubOuterWidth) {
         double hexagonHeight = (profileLength + hubInnerWidth) / 2 * Math.Sqrt(3);
-        return (int)((maxHeight - hubOuterWidth) / hexagonHeight);
+        return 1 + (int)((maxHeight - hubDiameter) / hexagonHeight);
     }
 
     private Border border = new Border();
     private Hexagon hexagon = new Hexagon();
+    private Line line = new Line();
 
     public void Draw(float width) {
         Vector2 screenPosition;
-        float hexRadius = 15;
+        float scale = width / this.maxWidth;
+        float hexRadius = this.hubDiameter / 2 * scale;
 
         border.Draw(GFX, this.offsetX, this.offsetY, width, width / this.maxWidth * this.maxHeight);
 
         for (int i = 0; i < this.gridWidth; i++) {
             for (int j = 0; j < this.gridHeight; j++) {
-                screenPosition = gridpointToHexagonalScreenpoint(i, j, width, hexRadius);
+                screenPosition = gridpointToHexagonalScreenpoint(i, j, scale, hexRadius);
                 hexagon.Draw(GFX, screenPosition.X, screenPosition.Y, hexRadius);
             }
         }
+
+        // for (int i = 0; i < this.gridWidth; i++) {
+        //     for (int j = 0; j < this.gridHeight; j++) {
+        //         screenPosition = gridpointToHexagonalScreenpoint(i, j, scale, hexRadius);
+        //         line.Draw(GFX, screenPosition.X, screenPosition.Y, hexRadius);
+        //     }
+        // }
     }
 
-    public Vector2 gridpointToHexagonalScreenpoint(int x, int y, float width, float hexRadius) {
+    public Vector2 gridpointToHexagonalScreenpoint(int x, int y, float scale, float hexRadius) {
         Vector2 screenPosition = new Vector2();
-        float scale = width / this.maxWidth;
         float oddOffset = 0;
 
         // float gridSpacingX = (this.profileLength + this.hubInnerWidth) * scale;
         // TODO: Figure out grid spacing and then transform them based on node size
-        float gridSpacingX = 39 * scale;
+        float gridSpacingX = (profileLength + hubInnerWidth) * scale;
         float gridSpacingY = (float)(gridSpacingX / 2 * Math.Sqrt(3));
 
         if (y % 2 == 1)
             oddOffset = gridSpacingX / 2;
 
-        screenPosition.X = (x * gridSpacingX) + offsetX + oddOffset;
-        screenPosition.Y = (float)(y * gridSpacingY) + offsetX;
+        screenPosition.X = (x * gridSpacingX) + offsetX + oddOffset + (this.hubOuterWidth / 2 * scale);
+        screenPosition.Y = (float)(y * gridSpacingY) + offsetX + (this.hubDiameter / 2 * scale);
 
         return screenPosition;
+    }
+}
+
+public class Point {
+    private int[] gridPosition;
+    public Vector2 position;
+    public List<Point> connectedPoints;
+    
+    public Point(int x, int y) {
+        this.gridPosition = new int[] {x, y};
+        this.connectedPoints = new List<Point>();
     }
 }

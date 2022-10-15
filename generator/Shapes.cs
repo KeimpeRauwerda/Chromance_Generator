@@ -16,8 +16,8 @@ public class Hexagon : Shape {
     for(int i=0; i < 6; i++)
     {
         shape[i] = new PointF(
-            x + r * (float)Math.Cos(i * 60 * Math.PI / 180f), 
-            y + r * (float)Math.Sin(i * 60 * Math.PI / 180f));
+            x + r * (float)Math.Cos(0.5 * Math.PI + i * 60 * Math.PI / 180f), 
+            y + r * (float)Math.Sin(0.5 * Math.PI + i * 60 * Math.PI / 180f));
     }
 
     GFX.FillPolygon(this.brush, shape);    
@@ -25,5 +25,7 @@ public class Hexagon : Shape {
 }
 
 public class Line {
-
+    public void Draw(Graphics GFX, int x1, int y1, int x2, int y2, float thickness) {
+        GFX.DrawLine(new Pen(Color.Black, thickness), new Point(x1, y1), new Point(x2, y2));
+    }
 }
