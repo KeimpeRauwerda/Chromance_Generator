@@ -31,7 +31,7 @@ partial class Form1
         this.components = new System.ComponentModel.Container();
         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
         this.ClientSize = new System.Drawing.Size(width, height);
-        this.Text = "Form1";
+        this.Text = "Chromance Generator";
 
         this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
     }

@@ -21,7 +21,8 @@ public class HexagonGrid
 
     public int gridWidth;
     public int gridHeight;
-    private int[,] grid;
+
+    private List<Point> points;
 
     public HexagonGrid(Graphics GFX, int offsetX, int offsetY, float maxWidth, float maxHeight, float profileLength = 25, float profileWidth = 1.7f)
     {
@@ -40,15 +41,36 @@ public class HexagonGrid
 
         this.oddWidthOffset = (profileLength + hubInnerWidth) / 2;
 
+        points = new List<Point>();
+        GeneratePoints();
+    }
+
+    public void GeneratePoints() {
         this.gridWidth = CalculateGridWidth(maxWidth, profileLength, hubInnerWidth, hubOuterWidth, oddWidthOffset);
         this.gridHeight = CalculateGridHeight(maxHeight, profileLength, hubInnerWidth, hubOuterWidth);
 
-        this.grid = new int[this.gridWidth, this.gridHeight];
+        Vector2 position;
+
+        DateTime now = DateTime.Now;
+        for (int x = 0; x < this.gridWidth; x++) {
+            for (int y = 0; y < this.gridHeight; y++) {
+                float hexRadius = this.hubDiameter / 2;
+                position = GridPointToWorldPoint(x, y, hexRadius);
+                
+                if (position.X + hubOuterWidth / 2 > maxWidth)
+                    continue;
+                if (position.Y + hubDiameter / 2 > maxHeight)
+                    continue;
+                
+                points.Add(new Point(x, y, position, points));
+            }
+        }
+        var time = (DateTime.Now - now).TotalMilliseconds;
     }
 
     public int CalculateGridWidth(float maxWidth, float profileLength, float hubInnerWidth, float hubOuterWidth, float oddWidthOffset) {
         double hexagonWidth = profileLength + hubInnerWidth;
-        return 1 + (int)((maxWidth - hubOuterWidth - oddWidthOffset) / hexagonWidth);
+        return 1 + (int)((maxWidth - hubOuterWidth) / hexagonWidth);
     }
 
     public int CalculateGridHeight(float maxHeight, float profileLength, float hubInnerWidth, float hubOuterWidth) {
@@ -61,53 +83,110 @@ public class HexagonGrid
     private Line line = new Line();
 
     public void Draw(float width) {
-        Vector2 screenPosition;
-        float scale = width / this.maxWidth;
-        float hexRadius = this.hubDiameter / 2 * scale;
-
         border.Draw(GFX, this.offsetX, this.offsetY, width, width / this.maxWidth * this.maxHeight);
+        float scale = width / maxWidth;
 
-        for (int i = 0; i < this.gridWidth; i++) {
-            for (int j = 0; j < this.gridHeight; j++) {
-                screenPosition = gridpointToHexagonalScreenpoint(i, j, scale, hexRadius);
-                hexagon.Draw(GFX, screenPosition.X, screenPosition.Y, hexRadius);
+        foreach (var point in points)
+            hexagon.Draw(GFX, point.position.X * scale + offsetX, point.position.Y * scale + offsetY, this.hubDiameter / 2 * scale);
+
+        foreach (var point in points) {
+            foreach (var adjacentPoint in point.adjacentPoints) {
+                if (point.Connect(adjacentPoint)) {
+                    line.Draw(GFX, 
+                        point.position.X * scale + offsetX,
+                        point.position.Y * scale + offsetX,
+                        adjacentPoint.position.X * scale + offsetX,
+                        adjacentPoint.position.Y * scale + offsetX,
+                        this.profileWidth * scale
+                    );
+                }
             }
         }
-
-        // for (int i = 0; i < this.gridWidth; i++) {
-        //     for (int j = 0; j < this.gridHeight; j++) {
-        //         screenPosition = gridpointToHexagonalScreenpoint(i, j, scale, hexRadius);
-        //         line.Draw(GFX, screenPosition.X, screenPosition.Y, hexRadius);
-        //     }
-        // }
     }
 
-    public Vector2 gridpointToHexagonalScreenpoint(int x, int y, float scale, float hexRadius) {
-        Vector2 screenPosition = new Vector2();
+    public Vector2 GridPointToWorldPoint(int x, int y, float hexRadius) {
+        Vector2 worldPoint = new Vector2();
         float oddOffset = 0;
 
         // float gridSpacingX = (this.profileLength + this.hubInnerWidth) * scale;
         // TODO: Figure out grid spacing and then transform them based on node size
-        float gridSpacingX = (profileLength + hubInnerWidth) * scale;
+        float gridSpacingX = (profileLength + hubInnerWidth);
         float gridSpacingY = (float)(gridSpacingX / 2 * Math.Sqrt(3));
 
-        if (y % 2 == 1)
+        if (y % 2 == 0)
             oddOffset = gridSpacingX / 2;
 
-        screenPosition.X = (x * gridSpacingX) + offsetX + oddOffset + (this.hubOuterWidth / 2 * scale);
-        screenPosition.Y = (float)(y * gridSpacingY) + offsetX + (this.hubDiameter / 2 * scale);
+        worldPoint.X = (x * gridSpacingX) + oddOffset + (this.hubOuterWidth / 2);
+        worldPoint.Y = (float)(y * gridSpacingY) + (this.hubDiameter / 2);
 
-        return screenPosition;
+        return worldPoint;
     }
 }
 
 public class Point {
-    private int[] gridPosition;
+    private Vector2 gridPosition;
     public Vector2 position;
+    public List<Point> adjacentPoints;
     public List<Point> connectedPoints;
     
-    public Point(int x, int y) {
-        this.gridPosition = new int[] {x, y};
+    public Point(int x, int y, Vector2 position, List<Point> points) {
+        this.gridPosition = new Vector2(x, y);
+        this.position = position;
+        this.adjacentPoints = new List<Point>();
         this.connectedPoints = new List<Point>();
+
+        FindAdjacened(points);
+    }
+
+    public void FindAdjacened(List<Point> points) {
+        List<Point> adjacentPoints;
+        int offset = 0;
+        
+        if (this.gridPosition.Y % 2 == 1) {
+            offset = 1;
+        }
+
+        adjacentPoints = points.Where(p =>
+            ((p.gridPosition.Y == this.gridPosition.Y) && (p.gridPosition.X == this.gridPosition.X - 1 || p.gridPosition.X == this.gridPosition.X + 1)) ||
+            ((p.gridPosition.Y == this.gridPosition.Y + 1) && (p.gridPosition.X == this.gridPosition.X - offset || p.gridPosition.X == this.gridPosition.X + 1 - offset)) ||
+            ((p.gridPosition.Y == this.gridPosition.Y - 1) && (p.gridPosition.X == this.gridPosition.X - offset || p.gridPosition.X == this.gridPosition.X + 1 - offset))
+        ).ToList();
+        
+        foreach (var point in adjacentPoints) {
+            AddAdjacent(point);
+            point.AddAdjacent(this);
+        }
+    }
+
+    public bool AddAdjacent(Point point) {
+        if (this.adjacentPoints.Contains(point))
+            return false;
+        this.adjacentPoints.Add(point);
+        point.adjacentPoints.Add(this);
+        return true;
+    }
+
+    public bool RemoveAdjacent(Point point) {
+        if (!this.adjacentPoints.Contains(point))
+            return false;
+        this.adjacentPoints.Remove(point);
+        point.adjacentPoints.Remove(this);
+        return true;
+    }
+
+    public bool Connect(Point point) {
+        if (this.connectedPoints.Contains(point))
+            return false;
+        this.connectedPoints.Add(point);
+        point.connectedPoints.Add(this);
+        return true;
+    }
+
+    public bool Disconnect(Point point) {
+        if (!this.connectedPoints.Contains(point))
+            return false;
+        this.connectedPoints.Remove(point);
+        point.connectedPoints.Remove(this);
+        return true;
     }
 }

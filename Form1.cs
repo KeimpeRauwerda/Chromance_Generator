@@ -7,8 +7,8 @@ public partial class Form1 : Form
     private int offsetX = 10;
     private int offsetY = 10;
     private int width = 1200;
-    private float wallWidth = 200;
-    private float wallHeight = 102.77f;
+    private float wallWidth = 230 * 1;
+    private float wallHeight = 102.77f * 1;
     public Form1()
     {
         int windowWidth = this.width + offsetX * 2;

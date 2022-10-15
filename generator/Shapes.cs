@@ -10,14 +10,13 @@ public class Border : Shape {
     }
 }
 public class Hexagon : Shape {
+    PointF[] shape = new PointF[6];
   public void Draw(Graphics GFX, float x, float y, float r) {
-    var shape = new PointF[6];
 
     for(int i=0; i < 6; i++)
     {
-        shape[i] = new PointF(
-            x + r * (float)Math.Cos(0.5 * Math.PI + i * 60 * Math.PI / 180f), 
-            y + r * (float)Math.Sin(0.5 * Math.PI + i * 60 * Math.PI / 180f));
+        shape[i].X = x + r * (float)Math.Cos(0.5 * Math.PI + i * 60 * Math.PI / 180f);
+        shape[i].Y = y + r * (float)Math.Sin(0.5 * Math.PI + i * 60 * Math.PI / 180f);
     }
 
     GFX.FillPolygon(this.brush, shape);    
@@ -25,7 +24,7 @@ public class Hexagon : Shape {
 }
 
 public class Line {
-    public void Draw(Graphics GFX, int x1, int y1, int x2, int y2, float thickness) {
-        GFX.DrawLine(new Pen(Color.Black, thickness), new Point(x1, y1), new Point(x2, y2));
+    public void Draw(Graphics GFX, float x1, float y1, float x2, float y2, float thickness) {
+        GFX.DrawLine(new Pen(Color.Black, thickness), x1, y1, x2, y2);
     }
 }
