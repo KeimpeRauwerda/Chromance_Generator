@@ -34,6 +34,7 @@ partial class Form1
         this.Text = "Chromance Generator";
 
         this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
+        this.Resize += new System.EventHandler(this.ResizeCanvas);
     }
 
     #endregion

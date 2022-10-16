@@ -5,7 +5,6 @@ namespace Chromance_Generator.Generator;
 
 public class HexagonGrid
 {
-    private Graphics GFX;
     private int offsetX;
     private int offsetY;
     private float maxWidth;
@@ -25,9 +24,8 @@ public class HexagonGrid
     public List<Point> points;
     public List<Line> lines;
 
-    public HexagonGrid(Graphics GFX, int offsetX, int offsetY, float maxWidth, float maxHeight, float profileLength = 25, float profileWidth = 1.7f)
+    public HexagonGrid(int offsetX, int offsetY, float maxWidth, float maxHeight, float profileLength = 25, float profileWidth = 1.7f)
     {
-        this.GFX = GFX;
         this.offsetX = offsetX;
         this.offsetY = offsetY;
         this.maxWidth = maxWidth;
@@ -44,16 +42,44 @@ public class HexagonGrid
 
         points = new List<Point>();
         lines = new List<Line>();
-        GeneratePoints();
     }
 
-    public void GeneratePoints() {
+    private Shapes.Border shape_border = new Shapes.Border();
+    private Shapes.Hexagon shape_hexagon = new Shapes.Hexagon();
+    private Shapes.Line shape_line = new Shapes.Line();
+
+    public void Draw(Graphics GFX, float width) {
+        shape_border.Draw(GFX, this.offsetX, this.offsetY, width, width / this.maxWidth * this.maxHeight);
+        float scale = width / maxWidth;
+
+        foreach (var point in points)
+            shape_hexagon.Draw(GFX, point.position.X * scale + offsetX, point.position.Y * scale + offsetY, this.hubDiameter / 2 * scale);
+        
+        foreach (var line in lines) {
+            shape_line.Draw(GFX,
+                line.points[0].position.X * scale + offsetX,
+                line.points[0].position.Y * scale + offsetY,
+                line.points[1].position.X * scale + offsetX,
+                line.points[1].position.Y * scale + offsetY,
+                this.profileWidth * scale
+            );
+        }
+    }
+    
+    public void GenerateGrid() {
+        this.points = GeneratePoints();
+        this.lines = GenerateLines(points);
+        foreach (var point in points.Where(p => p.connectedPoints.Count == 0).ToList())
+            points.Remove(point);
+    }
+
+    public List<Point> GeneratePoints() {
         this.gridWidth = CalculateGridWidth(maxWidth, profileLength, hubInnerWidth, hubOuterWidth, oddWidthOffset);
         this.gridHeight = CalculateGridHeight(maxHeight, profileLength, hubInnerWidth, hubOuterWidth);
 
+        var points = new List<Point>();
         Vector2 position;
 
-        DateTime now = DateTime.Now;
         for (int x = 0; x < this.gridWidth; x++) {
             for (int y = 0; y < this.gridHeight; y++) {
                 float hexRadius = this.hubDiameter / 2;
@@ -67,7 +93,67 @@ public class HexagonGrid
                 points.Add(new Point(this, x, y, position, points));
             }
         }
-        var time = (DateTime.Now - now).TotalMilliseconds;
+        return points;
+    }
+
+    public List<Line> GenerateLines(List<Point> points) {
+        var lines = new List<Line>();
+        Random random = new Random();
+        
+        // foreach (var point in points) {
+        //     foreach (var adjacentPoint in point.adjacentPoints) {
+        //         point.Connect(adjacentPoint);
+        //     }
+        // }
+        
+        Point startPoint = points.OrderBy(n => random.NextDouble()).First();
+        int depth = 0;
+        GenerateLinesRecursive(random, startPoint, points, lines, ref depth);
+
+        return lines;
+    }
+
+    public bool GenerateLinesRecursive(Random random, Point point, List<Point> points, List<Line> lines, ref int depth) {
+        depth++;
+
+        if (isValid(points, lines))
+            return true;
+
+        if (depth >= 100000) {
+            ClearGrid(points, lines);
+            return true;
+        }
+
+        List<Point> r_adjacentPoints = point.adjacentPoints.OrderBy(n => random.NextDouble()).ToList();
+        
+        foreach (var adjacentPoint in r_adjacentPoints) {
+            if (point.Connect(adjacentPoint, lines)) {
+                if(GenerateLinesRecursive(random, adjacentPoint, point.adjacentPoints, lines, ref depth))
+                    return true;
+                else
+                    point.Disconnect(adjacentPoint, lines);
+            }
+        }
+
+        return false;
+    }
+
+    public bool isValid(List<Point> points, List<Line> lines) {
+        if (lines.Count < 1000)
+            return false;
+        
+        if (points.Any(p => p.connectedPoints.Count == 1))
+            return false;
+
+        return true;
+    }
+
+    public void ClearGrid(List<Point> points, List<Line> lines) {
+        foreach (var point in points) {
+            for (int i = point.connectedPoints.Count; i > 0; i--) {
+                point.Disconnect(point.connectedPoints.ElementAt(i - 1), lines);
+            }
+        }
     }
 
     public int CalculateGridWidth(float maxWidth, float profileLength, float hubInnerWidth, float hubOuterWidth, float oddWidthOffset) {
@@ -78,33 +164,6 @@ public class HexagonGrid
     public int CalculateGridHeight(float maxHeight, float profileLength, float hubInnerWidth, float hubOuterWidth) {
         double hexagonHeight = (profileLength + hubInnerWidth) / 2 * Math.Sqrt(3);
         return 1 + (int)((maxHeight - hubDiameter) / hexagonHeight);
-    }
-
-    private Shapes.Border shape_border = new Shapes.Border();
-    private Shapes.Hexagon shape_hexagon = new Shapes.Hexagon();
-    private Shapes.Line shape_line = new Shapes.Line();
-
-    public void Draw(float width) {
-        shape_border.Draw(GFX, this.offsetX, this.offsetY, width, width / this.maxWidth * this.maxHeight);
-        float scale = width / maxWidth;
-
-        foreach (var point in points)
-            shape_hexagon.Draw(GFX, point.position.X * scale + offsetX, point.position.Y * scale + offsetY, this.hubDiameter / 2 * scale);
-
-        foreach (var point in points) {
-            foreach (var adjacentPoint in point.adjacentPoints) {
-                point.Connect(adjacentPoint);
-            }
-        }
-        foreach (var line in lines) {
-            shape_line.Draw(GFX,
-                line.points[0].position.X * scale + offsetX,
-                line.points[0].position.Y * scale + offsetY,
-                line.points[1].position.X * scale + offsetX,
-                line.points[1].position.Y * scale + offsetY,
-                this.profileWidth * scale
-            );
-        }
     }
 
     public Vector2 GridPointToWorldPoint(int x, int y, float hexRadius) {
@@ -179,21 +238,21 @@ public class Point {
         return true;
     }
 
-    public bool Connect(Point point) {
+    public bool Connect(Point point, List<Line> lines) {
         if (this.connectedPoints.Contains(point))
             return false;
         this.connectedPoints.Add(point);
         point.connectedPoints.Add(this);
-        hexagonGrid.lines.Add(new Line(this, point));
+        lines.Add(new Line(this, point));
         return true;
     }
 
-    public bool Disconnect(Point point) {
+    public bool Disconnect(Point point, List<Line> lines) {
         if (!this.connectedPoints.Contains(point))
             return false;
         this.connectedPoints.Remove(point);
         point.connectedPoints.Remove(this);
-        hexagonGrid.lines.Remove(hexagonGrid.lines.Where(l => l.points.Contains(this) && l.points.Contains(point)).First());
+        lines.Remove(lines.Where(l => l.points.Contains(this) && l.points.Contains(point)).First());
         return true;
     }
 }
