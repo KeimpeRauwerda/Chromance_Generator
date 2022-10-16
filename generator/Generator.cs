@@ -22,7 +22,8 @@ public class HexagonGrid
     public int gridWidth;
     public int gridHeight;
 
-    private List<Point> points;
+    public List<Point> points;
+    public List<Line> lines;
 
     public HexagonGrid(Graphics GFX, int offsetX, int offsetY, float maxWidth, float maxHeight, float profileLength = 25, float profileWidth = 1.7f)
     {
@@ -42,6 +43,7 @@ public class HexagonGrid
         this.oddWidthOffset = (profileLength + hubInnerWidth) / 2;
 
         points = new List<Point>();
+        lines = new List<Line>();
         GeneratePoints();
     }
 
@@ -62,7 +64,7 @@ public class HexagonGrid
                 if (position.Y + hubDiameter / 2 > maxHeight)
                     continue;
                 
-                points.Add(new Point(x, y, position, points));
+                points.Add(new Point(this, x, y, position, points));
             }
         }
         var time = (DateTime.Now - now).TotalMilliseconds;
@@ -78,29 +80,30 @@ public class HexagonGrid
         return 1 + (int)((maxHeight - hubDiameter) / hexagonHeight);
     }
 
-    private Border border = new Border();
-    private Hexagon hexagon = new Hexagon();
-    private Line line = new Line();
+    private Shapes.Border shape_border = new Shapes.Border();
+    private Shapes.Hexagon shape_hexagon = new Shapes.Hexagon();
+    private Shapes.Line shape_line = new Shapes.Line();
 
     public void Draw(float width) {
-        border.Draw(GFX, this.offsetX, this.offsetY, width, width / this.maxWidth * this.maxHeight);
+        shape_border.Draw(GFX, this.offsetX, this.offsetY, width, width / this.maxWidth * this.maxHeight);
         float scale = width / maxWidth;
 
         foreach (var point in points)
-            hexagon.Draw(GFX, point.position.X * scale + offsetX, point.position.Y * scale + offsetY, this.hubDiameter / 2 * scale);
+            shape_hexagon.Draw(GFX, point.position.X * scale + offsetX, point.position.Y * scale + offsetY, this.hubDiameter / 2 * scale);
 
         foreach (var point in points) {
             foreach (var adjacentPoint in point.adjacentPoints) {
-                if (point.Connect(adjacentPoint)) {
-                    line.Draw(GFX, 
-                        point.position.X * scale + offsetX,
-                        point.position.Y * scale + offsetX,
-                        adjacentPoint.position.X * scale + offsetX,
-                        adjacentPoint.position.Y * scale + offsetX,
-                        this.profileWidth * scale
-                    );
-                }
+                point.Connect(adjacentPoint);
             }
+        }
+        foreach (var line in lines) {
+            shape_line.Draw(GFX,
+                line.points[0].position.X * scale + offsetX,
+                line.points[0].position.Y * scale + offsetY,
+                line.points[1].position.X * scale + offsetX,
+                line.points[1].position.Y * scale + offsetY,
+                this.profileWidth * scale
+            );
         }
     }
 
@@ -124,12 +127,14 @@ public class HexagonGrid
 }
 
 public class Point {
+    private HexagonGrid hexagonGrid;
     private Vector2 gridPosition;
     public Vector2 position;
     public List<Point> adjacentPoints;
     public List<Point> connectedPoints;
     
-    public Point(int x, int y, Vector2 position, List<Point> points) {
+    public Point(HexagonGrid hexagonGrid, int x, int y, Vector2 position, List<Point> points) {
+        this.hexagonGrid = hexagonGrid;
         this.gridPosition = new Vector2(x, y);
         this.position = position;
         this.adjacentPoints = new List<Point>();
@@ -151,7 +156,7 @@ public class Point {
             ((p.gridPosition.Y == this.gridPosition.Y + 1) && (p.gridPosition.X == this.gridPosition.X - offset || p.gridPosition.X == this.gridPosition.X + 1 - offset)) ||
             ((p.gridPosition.Y == this.gridPosition.Y - 1) && (p.gridPosition.X == this.gridPosition.X - offset || p.gridPosition.X == this.gridPosition.X + 1 - offset))
         ).ToList();
-        
+
         foreach (var point in adjacentPoints) {
             AddAdjacent(point);
             point.AddAdjacent(this);
@@ -179,6 +184,7 @@ public class Point {
             return false;
         this.connectedPoints.Add(point);
         point.connectedPoints.Add(this);
+        hexagonGrid.lines.Add(new Line(this, point));
         return true;
     }
 
@@ -187,6 +193,17 @@ public class Point {
             return false;
         this.connectedPoints.Remove(point);
         point.connectedPoints.Remove(this);
+        hexagonGrid.lines.Remove(hexagonGrid.lines.Where(l => l.points.Contains(this) && l.points.Contains(point)).First());
         return true;
+    }
+}
+
+public class Line {
+    public Point[] points;
+    public Line(Point point1, Point point2) {
+        points = new Point[2] {
+            point1,
+            point2
+        };
     }
 }
