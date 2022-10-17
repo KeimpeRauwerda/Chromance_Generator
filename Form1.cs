@@ -18,8 +18,8 @@ public partial class Form1 : Form
         this.windowWidth = this.canvasWidth + offsetX * 2;
         this.windowHeight = (int)((this.canvasWidth / this.wallWidth * this.wallHeight) + offsetY * 2);
 
-        this.hexagonGrid = new HexagonGrid(offsetX, offsetY, wallWidth, wallHeight);
         InitializeComponent(windowWidth, windowHeight);
+        this.hexagonGrid = new HexagonGrid(offsetX, offsetY, wallWidth, wallHeight);
     }
 
     private void Form1_Paint(object sender, PaintEventArgs pe)

@@ -69,6 +69,10 @@ public class HexagonGrid
     public void GenerateGrid() {
         this.points = GeneratePoints();
         this.lines = GenerateLines(points);
+
+        if (lines.Count == 0)
+            return;
+        
         foreach (var point in points.Where(p => p.connectedPoints.Count == 0).ToList())
             points.Remove(point);
     }
@@ -107,39 +111,41 @@ public class HexagonGrid
         // }
         
         Point startPoint = points.OrderBy(n => random.NextDouble()).First();
-        int depth = 0;
-        GenerateLinesRecursive(random, startPoint, points, lines, ref depth);
+        int iteration = 0;
+        (bool done, bool success) = GenerateLinesRecursive(random, startPoint, points, lines, ref iteration);
+        
+        if (!success)
+            ClearGrid(points, lines);
 
         return lines;
     }
 
-    public bool GenerateLinesRecursive(Random random, Point point, List<Point> points, List<Line> lines, ref int depth) {
-        depth++;
+    public (bool, bool) GenerateLinesRecursive(Random random, Point point, List<Point> points, List<Line> lines, ref int iteration) {
+        iteration++;
 
         if (isValid(points, lines))
-            return true;
+            return (true, true);
 
-        if (depth >= 100000) {
-            ClearGrid(points, lines);
-            return true;
-        }
+        if (iteration >= 100000)
+            return (true, false);
 
         List<Point> r_adjacentPoints = point.adjacentPoints.OrderBy(n => random.NextDouble()).ToList();
         
         foreach (var adjacentPoint in r_adjacentPoints) {
             if (point.Connect(adjacentPoint, lines)) {
-                if(GenerateLinesRecursive(random, adjacentPoint, point.adjacentPoints, lines, ref depth))
-                    return true;
+                (bool done, bool success) = GenerateLinesRecursive(random, adjacentPoint, points, lines, ref iteration);
+                if(done)
+                    return (done, success);
                 else
                     point.Disconnect(adjacentPoint, lines);
             }
         }
 
-        return false;
+        return (false, false);
     }
 
     public bool isValid(List<Point> points, List<Line> lines) {
-        if (lines.Count < 1000)
+        if (lines.Count < 40)
             return false;
         
         if (points.Any(p => p.connectedPoints.Count == 1))
