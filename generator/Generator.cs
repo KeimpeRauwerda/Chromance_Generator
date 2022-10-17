@@ -66,9 +66,41 @@ public class HexagonGrid
         }
     }
     
-    public void GenerateGrid() {
+    public void GenerateGrid(int minPoints, int maxPoints, int minProfiles, int maxProfiles) {
         this.points = GeneratePoints();
-        this.lines = GenerateLines(points);
+        
+        int maxPossibleProfiles = 0;
+        foreach (var point in points) {
+            foreach (var adjacentPoint in point.adjacentPoints) {
+                maxPossibleProfiles++;
+            }
+        }
+        maxPossibleProfiles = maxPossibleProfiles / 2;
+        
+        if (maxPoints < 3)
+            maxPoints = 3;
+        if (maxPoints > this.points.Count)
+            maxPoints = this.points.Count;
+        
+        if (minPoints < 3)
+            minPoints = 3;
+        if (minPoints > maxPoints)
+            minPoints = maxPoints;
+        
+        if (maxProfiles < 3)
+            maxProfiles = 3;
+        if (maxProfiles > maxPossibleProfiles)
+            maxProfiles = maxPossibleProfiles;
+
+        if (minProfiles < 3)
+            minProfiles = 3;
+        if (minProfiles > maxProfiles)
+            minProfiles = maxProfiles;
+        
+
+        this.lines.Clear();
+        for (int i = 0; i < 10 && !this.lines.Any(); i++)
+            this.lines = GenerateLines(points, minPoints, maxPoints, minProfiles, maxProfiles);
 
         if (lines.Count == 0)
             return;
@@ -100,19 +132,16 @@ public class HexagonGrid
         return points;
     }
 
-    public List<Line> GenerateLines(List<Point> points) {
+    public List<Line> GenerateLines(List<Point> points, int minPoints, int maxPoints, int minProfiles = 35, int maxProfiles = 40) {
         var lines = new List<Line>();
+        var DateTime = new DateTime(2001, 8, 7) - new DateTime(0);
+
         Random random = new Random();
         
-        // foreach (var point in points) {
-        //     foreach (var adjacentPoint in point.adjacentPoints) {
-        //         point.Connect(adjacentPoint);
-        //     }
-        // }
-        
         Point startPoint = points.OrderBy(n => random.NextDouble()).First();
+        List<Point> validPoints = new List<Point>() {startPoint};
         int iteration = 0;
-        (bool done, bool success) = GenerateLinesRecursive(random, startPoint, points, lines, ref iteration);
+        (bool done, bool success) = GenerateLinesRecursive(random, validPoints, lines, minPoints, maxPoints, minProfiles, maxProfiles, ref iteration);
         
         if (!success)
             ClearGrid(points, lines);
@@ -120,40 +149,64 @@ public class HexagonGrid
         return lines;
     }
 
-    public (bool, bool) GenerateLinesRecursive(Random random, Point point, List<Point> points, List<Line> lines, ref int iteration) {
+    public (bool, bool) GenerateLinesRecursive(Random random, List<Point> validPoints, List<Line> lines, int minPoints, int maxPoints, int minProfiles, int maxProfiles, ref int iteration) {
         iteration++;
-
-        if (isValid(points, lines))
-            return (true, true);
 
         if (iteration >= 100000)
             return (true, false);
 
-        List<Point> r_adjacentPoints = point.adjacentPoints.OrderBy(n => random.NextDouble()).ToList();
-        
-        foreach (var adjacentPoint in r_adjacentPoints) {
-            if (point.Connect(adjacentPoint, lines)) {
-                (bool done, bool success) = GenerateLinesRecursive(random, adjacentPoint, points, lines, ref iteration);
-                if(done)
+        if (isIllegal(validPoints, lines, maxPoints, maxProfiles))
+            return (false, false);
+
+        if (isValid(validPoints, lines, minPoints, minProfiles))
+            return (true, true);
+
+        while (true) {
+            Point r_validPoint = validPoints.OrderBy(n => random.NextDouble()).First();
+            List<Point> r_adjacentPoints = r_validPoint.adjacentPoints.OrderBy(n => random.NextDouble()).ToList();
+            Point adjacentPoint = r_adjacentPoints.First();
+
+            if (r_validPoint.Connect(adjacentPoint, lines)) {
+                if (!validPoints.Contains(adjacentPoint))
+                    validPoints.Add(adjacentPoint);
+
+                (bool done, bool success) = GenerateLinesRecursive(random, validPoints, lines, minPoints, maxPoints, minProfiles, maxProfiles, ref iteration);
+
+                if(done) {
                     return (done, success);
-                else
-                    point.Disconnect(adjacentPoint, lines);
+                }
+                else {
+                    r_validPoint.Disconnect(adjacentPoint, lines);
+                    if (validPoints.Contains(adjacentPoint))
+                        validPoints.Remove(adjacentPoint);
+                }
             }
         }
-
-        return (false, false);
     }
 
-    public bool isValid(List<Point> points, List<Line> lines) {
-        if (lines.Count < 40)
+    public bool isIllegal(List<Point> validPoints, List<Line> lines, int maxPoints, int maxProfiles) {
+        if (lines.Count > maxProfiles)
+            return true;
+        
+        if (validPoints.Count > maxPoints)
+            return true;
+
+        return false;
+    }
+
+
+    public bool isValid(List<Point> validPoints, List<Line> lines, int minPoints, int minProfiles) {
+        if (lines.Count < minProfiles)
             return false;
         
-        if (points.Any(p => p.connectedPoints.Count == 1))
+        if (validPoints.Count < minPoints)
+            return false;
+        
+        if (validPoints.Any(p => p.connectedPoints.Count == 1))
             return false;
 
         return true;
     }
-
     public void ClearGrid(List<Point> points, List<Line> lines) {
         foreach (var point in points) {
             for (int i = point.connectedPoints.Count; i > 0; i--) {

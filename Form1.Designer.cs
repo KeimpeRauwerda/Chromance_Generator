@@ -35,6 +35,16 @@ partial class Form1
 
         this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
         this.Resize += new System.EventHandler(this.ResizeCanvas);
+        
+        InitializeGenerateButton();
+    }
+
+    private void InitializeGenerateButton() {
+        Button generateButton = new Button();
+        generateButton.Location = new Point(10, 10);
+        generateButton.Text = "Generate";
+        generateButton.Click += new System.EventHandler(this.generateButton_Click);
+        Controls.Add(generateButton);
     }
 
     #endregion
