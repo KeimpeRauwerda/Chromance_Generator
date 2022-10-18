@@ -25,13 +25,13 @@ public class HexagonGrid
     public List<Point> points;
     public List<Line> lines;
 
-    public HexagonGrid(int offsetX, int offsetY, float maxWidth, float maxHeight, float profileLength = 25, float profileWidth = 1.7f)
+    public HexagonGrid(int offsetX, int offsetY, float maxWidth, float maxHeight, float profileLength, float hubInnerWidth, float hubOuterWidth, float profileWidth = 1.7f)
     {
         this.offsetX = offsetX;
         this.offsetY = offsetY;
 
-        this.hubOuterWidth = 5;
-        this.hubInnerWidth = 3;
+        this.hubInnerWidth = hubInnerWidth;
+        this.hubOuterWidth = hubOuterWidth;
         this.hubDiameter = (float)(this.hubOuterWidth / Math.Sqrt(3) * 2);
 
         this.oddWidthOffset = (profileLength + hubInnerWidth) / 2;
@@ -41,7 +41,7 @@ public class HexagonGrid
         points = new List<Point>();
         lines = new List<Line>();
 
-        this.UpdateGrid(maxHeight, maxWidth, profileLength, profileWidth);
+        this.UpdateGrid(maxWidth, maxHeight, profileLength, profileWidth, hubInnerWidth, hubOuterWidth);
     }
 
     private Shapes.Border shape_border = new Shapes.Border();
@@ -69,11 +69,14 @@ public class HexagonGrid
         }
     }
 
-    public void UpdateGrid(float maxWidth, float maxHeight, float profileLength = 25, float profileWidth = 1.7f) {
+    public void UpdateGrid(float maxWidth, float maxHeight, float profileLength, float hubInnerWidth, float hubOuterWidth, float profileWidth = 1.7f) {
         this.maxWidth = maxWidth;
         this.maxHeight = maxHeight;
         this.profileLength = profileLength;
         this.profileWidth = profileWidth;
+        this.hubInnerWidth = hubInnerWidth;
+        this.hubOuterWidth = hubOuterWidth;
+        this.hubDiameter = (float)(this.hubOuterWidth / Math.Sqrt(3) * 2);
 
         this.ClearGrid();
         this.points = this.GeneratePoints();

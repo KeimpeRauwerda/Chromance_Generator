@@ -7,15 +7,6 @@ namespace Chromance_Generator;
 
 public partial class Form1 : Form
     {
-    delegate void SetTextCallbackDelegate(string text);
-    public Button button_generate = new Button();
-    public Label label_generate = new Label();
-    public TrackBar trackbar_wallWidth = new TrackBar();
-    public TrackBar trackbar_wallHeight = new TrackBar();
-    public TrackBar trackbar_profileLength = new TrackBar();
-    public TrackBar trackbar_hubInnerWidth = new TrackBar();
-    public TrackBar trackbar_hubOuterWidth = new TrackBar();
-    
     private int paddingX = 10;
     private int paddingY = 10;
     private int offsetX = 200;
@@ -35,7 +26,7 @@ public partial class Form1 : Form
     {
         ResizeWindow();
         InitializeComponent(windowWidth, windowHeight);
-        this.hexagonGrid = new HexagonGrid(offsetX + paddingX, offsetY + paddingY, wallWidth, wallHeight);
+        this.hexagonGrid = new HexagonGrid(this.offsetX + this.paddingX, this.offsetY + this.paddingY, this.wallWidth, this.wallHeight, this.profileLength, this.hubInnerWidth, this.hubOuterWidth);
     }
 
     public void ResizeWindow() {
@@ -106,25 +97,36 @@ public partial class Form1 : Form
     private void Trackbar_wallWidth_Scroll(object sender, EventArgs e) {
         TrackBar trackBar = (TrackBar)sender;
         this.wallWidth = trackBar.Value;
-        this.hexagonGrid.UpdateGrid(this.wallWidth, this.wallHeight);
+        this.textBox_wallWidth.Text = trackBar.Value.ToString();
+        this.hexagonGrid.UpdateGrid(this.wallWidth, this.wallHeight, this.profileLength, this.hubInnerWidth, this.hubOuterWidth);
         this.ResizeCanvas();
     }
     private void Trackbar_wallHeight_Scroll(object sender, EventArgs e) {
         TrackBar trackBar = (TrackBar)sender;
         this.wallHeight = trackBar.Value;
-        this.hexagonGrid.UpdateGrid(this.wallWidth, this.wallHeight);
+        this.textBox_wallHeight.Text = trackBar.Value.ToString();
+        this.hexagonGrid.UpdateGrid(this.wallWidth, this.wallHeight, this.profileLength, this.hubInnerWidth, this.hubOuterWidth);
         this.ResizeCanvas();
     }
-    private void Trackbar_ProfileSize_Scroll(object sender, EventArgs e) {
+    private void Trackbar_ProfileLength_Scroll(object sender, EventArgs e) {
         TrackBar trackBar = (TrackBar)sender;
-        this.wallWidth = trackBar.Value;
+        this.profileLength = trackBar.Value;
+        this.textBox_profileLength.Text = trackBar.Value.ToString();
+        this.hexagonGrid.UpdateGrid(this.wallWidth, this.wallHeight, this.profileLength, this.hubInnerWidth, this.hubOuterWidth);
+        this.ResizeCanvas();
     }
-    private void Trackbar_hubInnerSize_Scroll(object sender, EventArgs e) {
+    private void Trackbar_hubInnerWidth_Scroll(object sender, EventArgs e) {
         TrackBar trackBar = (TrackBar)sender;
-        this.wallWidth = trackBar.Value;
+        this.hubInnerWidth = trackBar.Value;
+        this.textBox_hubInnerWidth.Text = trackBar.Value.ToString();
+        this.hexagonGrid.UpdateGrid(this.wallWidth, this.wallHeight, this.profileLength, this.hubInnerWidth, this.hubOuterWidth);
+        this.ResizeCanvas();
     }
-    private void Trackbar_hubOuterSize_Scroll(object sender, EventArgs e) {
+    private void Trackbar_hubOuterWidth_Scroll(object sender, EventArgs e) {
         TrackBar trackBar = (TrackBar)sender;
-        this.wallWidth = trackBar.Value;
+        this.hubOuterWidth = trackBar.Value;
+        this.textBox_hubOuterWidth.Text = trackBar.Value.ToString();
+        this.hexagonGrid.UpdateGrid(this.wallWidth, this.wallHeight, this.profileLength, this.hubInnerWidth, this.hubOuterWidth);
+        this.ResizeCanvas();
     }
 }
