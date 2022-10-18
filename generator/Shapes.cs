@@ -1,7 +1,8 @@
 namespace Chromance_Generator.Shapes;
 
 public abstract class Shape {
-    protected Brush brush = new SolidBrush(Color.Black);
+    protected Brush blackBrush = new SolidBrush(Color.Black);
+    protected Brush redBrush = new SolidBrush(Color.Red);
 }
 
 public class Border : Shape {
@@ -19,7 +20,7 @@ public class Hexagon : Shape {
         shape[i].Y = y + r * (float)Math.Sin(0.5 * Math.PI + i * 60 * Math.PI / 180f);
     }
 
-    GFX.FillPolygon(this.brush, shape);    
+    GFX.FillPolygon(this.blackBrush, shape);
   }
 }
 
