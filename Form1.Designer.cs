@@ -3,11 +3,17 @@
 partial class Form1
 {
     delegate void SetTextCallbackDelegate(string text);
+    delegate void SetRedrawCallbackDelegate();
     public TrackBar trackbar_wallWidth = new TrackBar();
     public TrackBar trackbar_wallHeight = new TrackBar();
     public TrackBar trackbar_profileLength = new TrackBar();
     public TrackBar trackbar_hubInnerWidth = new TrackBar();
     public TrackBar trackbar_hubOuterWidth = new TrackBar();
+
+    public TrackBar trackbar_minPoints = new TrackBar();
+    public TrackBar trackbar_maxPoints = new TrackBar();
+    public TrackBar trackbar_minProfiles = new TrackBar();
+    public TrackBar trackbar_maxProfiles = new TrackBar();
 
     public Label label_wallWidth = new Label();
     public Label label_wallHeight = new Label();
@@ -15,11 +21,21 @@ partial class Form1
     public Label label_hubInnerWidth = new Label();
     public Label label_hubOuterWidth = new Label();
 
+    public Label label_minPoints = new Label();
+    public Label label_maxPoints = new Label();
+    public Label label_minProfiles = new Label();
+    public Label label_maxProfiles = new Label();
+
     public TextBox textBox_wallWidth = new TextBox();
     public TextBox textBox_wallHeight = new TextBox();
     public TextBox textBox_profileLength = new TextBox();
     public TextBox textBox_hubInnerWidth = new TextBox();
     public TextBox textBox_hubOuterWidth = new TextBox();
+
+    public TextBox textBox_minPoints = new TextBox();
+    public TextBox textBox_maxPoints = new TextBox();
+    public TextBox textBox_minProfiles = new TextBox();
+    public TextBox textBox_maxProfiles = new TextBox();
 
     public Button button_generate = new Button();
     public Label label_generate = new Label();
@@ -67,48 +83,80 @@ partial class Form1
         this.label_profileLength.Location = new Point(this.paddingX + 5, this.paddingY + 120);
         this.label_hubInnerWidth.Location = new Point(this.paddingX + 5, this.paddingY + 180);
         this.label_hubOuterWidth.Location = new Point(this.paddingX + 5, this.paddingY + 240);
+        this.label_minPoints.Location     = new Point(this.paddingX + 5, this.paddingY + 310);
+        this.label_maxPoints.Location     = new Point(this.paddingX + 5, this.paddingY + 370);
+        this.label_minProfiles.Location   = new Point(this.paddingX + 5, this.paddingY + 430);
+        this.label_maxProfiles.Location   = new Point(this.paddingX + 5, this.paddingY + 490);
 
         this.trackbar_wallWidth.Location     = new Point(this.paddingX, this.paddingY + 20);
         this.trackbar_wallHeight.Location    = new Point(this.paddingX, this.paddingY + 80);
         this.trackbar_profileLength.Location = new Point(this.paddingX, this.paddingY + 140);
         this.trackbar_hubInnerWidth.Location = new Point(this.paddingX, this.paddingY + 200);
         this.trackbar_hubOuterWidth.Location = new Point(this.paddingX, this.paddingY + 260);
+        this.trackbar_minPoints.Location     = new Point(this.paddingX, this.paddingY + 330);
+        this.trackbar_maxPoints.Location     = new Point(this.paddingX, this.paddingY + 390);
+        this.trackbar_minProfiles.Location   = new Point(this.paddingX, this.paddingY + 450);
+        this.trackbar_maxProfiles.Location   = new Point(this.paddingX, this.paddingY + 510);
 
         this.textBox_wallWidth.Location     = new Point(this.offsetX - this.paddingX - 30, this.paddingY + 20);
         this.textBox_wallHeight.Location    = new Point(this.offsetX - this.paddingX - 30, this.paddingY + 80);
         this.textBox_profileLength.Location = new Point(this.offsetX - this.paddingX - 30, this.paddingY + 140);
         this.textBox_hubInnerWidth.Location = new Point(this.offsetX - this.paddingX - 30, this.paddingY + 200);
         this.textBox_hubOuterWidth.Location = new Point(this.offsetX - this.paddingX - 30, this.paddingY + 260);
+        this.textBox_minPoints.Location     = new Point(this.offsetX - this.paddingX - 30, this.paddingY + 330);
+        this.textBox_maxPoints.Location     = new Point(this.offsetX - this.paddingX - 30, this.paddingY + 390);
+        this.textBox_minProfiles.Location   = new Point(this.offsetX - this.paddingX - 30, this.paddingY + 450);
+        this.textBox_maxProfiles.Location   = new Point(this.offsetX - this.paddingX - 30, this.paddingY + 510);
 
         this.label_wallWidth.Size     = new Size(this.offsetX - this.paddingX, 20);
         this.label_wallHeight.Size    = new Size(this.offsetX - this.paddingX, 20);
         this.label_profileLength.Size = new Size(this.offsetX - this.paddingX, 20);
         this.label_hubInnerWidth.Size = new Size(this.offsetX - this.paddingX, 20);
         this.label_hubOuterWidth.Size = new Size(this.offsetX - this.paddingX, 20);
+        this.label_minPoints.Size     = new Size(this.offsetX - this.paddingX, 20);
+        this.label_maxPoints.Size     = new Size(this.offsetX - this.paddingX, 20);
+        this.label_minProfiles.Size   = new Size(this.offsetX - this.paddingX, 20);
+        this.label_maxProfiles.Size   = new Size(this.offsetX - this.paddingX, 20);
 
         this.trackbar_wallWidth.Size     = new Size(this.offsetX - this.paddingX - 40, 45);
         this.trackbar_wallHeight.Size    = new Size(this.offsetX - this.paddingX - 40, 45);
         this.trackbar_profileLength.Size = new Size(this.offsetX - this.paddingX - 40, 45);
         this.trackbar_hubInnerWidth.Size = new Size(this.offsetX - this.paddingX - 40, 45);
         this.trackbar_hubOuterWidth.Size = new Size(this.offsetX - this.paddingX - 40, 45);
+        this.trackbar_minPoints.Size     = new Size(this.offsetX - this.paddingX - 40, 45);
+        this.trackbar_maxPoints.Size     = new Size(this.offsetX - this.paddingX - 40, 45);
+        this.trackbar_minProfiles.Size   = new Size(this.offsetX - this.paddingX - 40, 45);
+        this.trackbar_maxProfiles.Size   = new Size(this.offsetX - this.paddingX - 40, 45);
         
         this.textBox_wallWidth.Size     = new Size(40, 20);
         this.textBox_wallHeight.Size    = new Size(40, 20);
         this.textBox_profileLength.Size = new Size(40, 20);
         this.textBox_hubInnerWidth.Size = new Size(40, 20);
         this.textBox_hubOuterWidth.Size = new Size(40, 20);
+        this.textBox_minPoints.Size     = new Size(40, 20);
+        this.textBox_maxPoints.Size     = new Size(40, 20);
+        this.textBox_minProfiles.Size   = new Size(40, 20);
+        this.textBox_maxProfiles.Size   = new Size(40, 20);
         
         this.textBox_wallWidth.Text     = this.wallWidth.ToString();
         this.textBox_wallHeight.Text    = this.wallHeight.ToString();
         this.textBox_profileLength.Text = this.profileLength.ToString();
         this.textBox_hubInnerWidth.Text = this.hubInnerWidth.ToString();
         this.textBox_hubOuterWidth.Text = this.hubOuterWidth.ToString();
+        this.textBox_minPoints.Text     = this.minPoints.ToString();
+        this.textBox_maxPoints.Text     = this.maxPoints.ToString();
+        this.textBox_minProfiles.Text   = this.minProfiles.ToString();
+        this.textBox_maxProfiles.Text   = this.maxProfiles.ToString();
         
         this.label_wallWidth.Text     = "Wall width in cm";
         this.label_wallHeight.Text    = "Wall height in cm";
         this.label_profileLength.Text = "Profile length in cm";
         this.label_hubInnerWidth.Text = "Hub inner width in cm";
         this.label_hubOuterWidth.Text = "Hub outer width in cm";
+        this.label_minPoints.Text     = "Minimum amount of points";
+        this.label_maxPoints.Text     = "Maximum amount of points";
+        this.label_minProfiles.Text   = "Minimum amount of LED profiles";
+        this.label_maxProfiles.Text   = "Maximum amount of LED profiles";
         
         this.trackbar_wallWidth.Minimum = 10;
         this.trackbar_wallWidth.Maximum = 400;
@@ -134,37 +182,73 @@ partial class Form1
         this.trackbar_hubOuterWidth.Maximum = 10;
         this.trackbar_hubOuterWidth.SmallChange = 1;
         this.trackbar_hubOuterWidth.Value = (int)this.hubOuterWidth;
+
+        this.trackbar_minPoints.Minimum = 3;
+        this.trackbar_minPoints.Maximum = 100;
+        this.trackbar_minPoints.SmallChange = 1;
+        this.trackbar_minPoints.Value = (int)this.minPoints;
+
+        this.trackbar_maxPoints.Minimum = 3;
+        this.trackbar_maxPoints.Maximum = 100;
+        this.trackbar_maxPoints.SmallChange = 1;
+        this.trackbar_maxPoints.Value = (int)this.maxPoints;
+
+        this.trackbar_minProfiles.Minimum = 3;
+        this.trackbar_minProfiles.Maximum = 100;
+        this.trackbar_minProfiles.SmallChange = 1;
+        this.trackbar_minProfiles.Value = (int)this.minProfiles;
+
+        this.trackbar_maxProfiles.Minimum = 3;
+        this.trackbar_maxProfiles.Maximum = 100;
+        this.trackbar_maxProfiles.SmallChange = 1;
+        this.trackbar_maxProfiles.Value = (int)this.maxProfiles;
         
         this.trackbar_wallWidth.Scroll += new System.EventHandler(this.Trackbar_wallWidth_Scroll);
         this.trackbar_wallHeight.Scroll += new System.EventHandler(this.Trackbar_wallHeight_Scroll);
         this.trackbar_profileLength.Scroll += new System.EventHandler(this.Trackbar_ProfileLength_Scroll);
         this.trackbar_hubInnerWidth.Scroll += new System.EventHandler(this.Trackbar_hubInnerWidth_Scroll);
         this.trackbar_hubOuterWidth.Scroll += new System.EventHandler(this.Trackbar_hubOuterWidth_Scroll);
+        this.trackbar_minPoints.Scroll += new System.EventHandler(this.Trackbar_minPoints_Scroll);
+        this.trackbar_maxPoints.Scroll += new System.EventHandler(this.Trackbar_maxPoints_Scroll);
+        this.trackbar_minProfiles.Scroll += new System.EventHandler(this.Trackbar_minProfiles_Scroll);
+        this.trackbar_maxProfiles.Scroll += new System.EventHandler(this.Trackbar_maxProfiles_Scroll);
 
         Controls.Add(this.label_wallWidth);
         Controls.Add(this.label_wallHeight);
         Controls.Add(this.label_profileLength);
         Controls.Add(this.label_hubInnerWidth);
         Controls.Add(this.label_hubOuterWidth);
+        Controls.Add(this.label_minPoints);
+        Controls.Add(this.label_maxPoints);
+        Controls.Add(this.label_minProfiles);
+        Controls.Add(this.label_maxProfiles);
 
         Controls.Add(this.trackbar_wallWidth);
         Controls.Add(this.trackbar_wallHeight);
         Controls.Add(this.trackbar_profileLength);
         Controls.Add(this.trackbar_hubInnerWidth);
         Controls.Add(this.trackbar_hubOuterWidth);
+        Controls.Add(this.trackbar_minPoints);
+        Controls.Add(this.trackbar_maxPoints);
+        Controls.Add(this.trackbar_minProfiles);
+        Controls.Add(this.trackbar_maxProfiles);
 
         Controls.Add(this.textBox_wallWidth);
         Controls.Add(this.textBox_wallHeight);
         Controls.Add(this.textBox_profileLength);
         Controls.Add(this.textBox_hubInnerWidth);
         Controls.Add(this.textBox_hubOuterWidth);
+        Controls.Add(this.textBox_minPoints);
+        Controls.Add(this.textBox_maxPoints);
+        Controls.Add(this.textBox_minProfiles);
+        Controls.Add(this.textBox_maxProfiles);
 
-        this.button_generate.Location = new Point(this.paddingX, this.paddingY + 350);
+        this.button_generate.Location = new Point(this.paddingX, this.paddingY + 555);
         this.button_generate.Text = "Generate";
         this.button_generate.Click += new System.EventHandler(this.Button_generate_Click);
         Controls.Add(button_generate);
 
-        this.label_generate.Location = new Point(this.paddingX + 5, this.paddingY + 375);
+        this.label_generate.Location = new Point(this.paddingX + 5, this.paddingY + 580);
         this.label_generate.Size = new Size(this.offsetX - this.paddingX, 20);
         Controls.Add(label_generate);
     }

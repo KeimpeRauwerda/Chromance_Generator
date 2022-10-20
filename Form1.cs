@@ -21,6 +21,11 @@ public partial class Form1 : Form
     private float profileLength = 25;
     private float hubInnerWidth = 3;
     private float hubOuterWidth = 5;
+
+    private int minPoints = 3;
+    private int maxPoints = 25;
+    private int minProfiles = 35;
+    private int maxProfiles = 40;
     private HexagonGrid hexagonGrid;
     public Form1()
     {
@@ -44,7 +49,6 @@ public partial class Form1 : Form
         // hexagonGrid.GenerateGrid(15, 25, 0, 40);
         this.hexagonGrid.Draw(GFX, this.canvasWidth);
     }
-
     private void ResizeCanvas(object sender, EventArgs e) {
         ResizeCanvas();
     }
@@ -77,7 +81,8 @@ public partial class Form1 : Form
     }
 
     private void GenerateGrid() {
-        this.hexagonGrid.GenerateGrid(15, 25, 0, 40, this);
+        this.hexagonGrid.ClearGrid();
+        this.hexagonGrid.GenerateGrid(this.minPoints, this.maxPoints, this.minProfiles, this.maxProfiles, this);
     }
 
     public void SetLabel(string text) {
@@ -91,6 +96,20 @@ public partial class Form1 : Form
         }
         else {
             this.label_generate.Text = text;
+        }
+    }
+
+    public void ForceRedraw() {
+        this.ForceRedrawCallback();
+    }
+
+    private void ForceRedrawCallback() {
+        if (this.InvokeRequired) {
+            SetRedrawCallbackDelegate t = new SetRedrawCallbackDelegate(ForceRedrawCallback);
+            this.Invoke(t, new object[] {});
+        }
+        else {
+            this.Refresh();
         }
     }
 
@@ -129,4 +148,49 @@ public partial class Form1 : Form
         this.hexagonGrid.UpdateGrid(this.wallWidth, this.wallHeight, this.profileLength, this.hubInnerWidth, this.hubOuterWidth);
         this.ResizeCanvas();
     }
+
+    private void Trackbar_minPoints_Scroll(object sender, EventArgs e) {
+        TrackBar trackBar = (TrackBar)sender;
+        this.minPoints = trackBar.Value;
+        this.textBox_minPoints.Text = trackBar.Value.ToString();
+        if (this.maxPoints < this.minPoints) {
+            this.maxPoints = this.minPoints;
+            this.trackbar_maxPoints.Value = this.minPoints;
+            this.textBox_maxPoints.Text = this.minPoints.ToString();
+        }
+    }
+
+    private void Trackbar_maxPoints_Scroll(object sender, EventArgs e) {
+        TrackBar trackBar = (TrackBar)sender;
+        this.maxPoints = trackBar.Value;
+        this.textBox_maxPoints.Text = trackBar.Value.ToString();
+        if (this.minPoints > this.maxPoints) {
+            this.minPoints = this.maxPoints;
+            this.trackbar_minPoints.Value = this.maxPoints;
+            this.textBox_minPoints.Text = this.maxPoints.ToString();
+        }
+    }
+
+    private void Trackbar_minProfiles_Scroll(object sender, EventArgs e) {
+        TrackBar trackBar = (TrackBar)sender;
+        this.minProfiles = trackBar.Value;
+        this.textBox_minProfiles.Text = trackBar.Value.ToString();
+        if (this.maxProfiles < this.minProfiles) {
+            this.maxProfiles = this.minProfiles;
+            this.trackbar_maxProfiles.Value = this.minProfiles;
+            this.textBox_maxProfiles.Text = this.minProfiles.ToString();
+        }
+    }
+
+    private void Trackbar_maxProfiles_Scroll(object sender, EventArgs e) {
+        TrackBar trackBar = (TrackBar)sender;
+        this.maxProfiles = trackBar.Value;
+        this.textBox_maxProfiles.Text = trackBar.Value.ToString();
+        if (this.minProfiles > this.maxProfiles) {
+            this.minProfiles = this.maxProfiles;
+            this.trackbar_minProfiles.Value = this.maxProfiles;
+            this.textBox_minProfiles.Text = this.maxProfiles.ToString();
+        }
+    }
+
 }
