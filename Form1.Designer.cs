@@ -37,6 +37,9 @@ partial class Form1
     public TextBox textBox_minProfiles = new TextBox();
     public TextBox textBox_maxProfiles = new TextBox();
 
+    public CheckBox checkBox_allowSingleDegree = new CheckBox();
+    public CheckBox checkBox_generateSymmetrical = new CheckBox();
+    public CheckBox checkBox_showSteps = new CheckBox();
     public Button button_generate = new Button();
     public Label label_generate = new Label();
 
@@ -243,14 +246,32 @@ partial class Form1
         Controls.Add(this.textBox_minProfiles);
         Controls.Add(this.textBox_maxProfiles);
 
-        this.button_generate.Location = new Point(this.paddingX, this.paddingY + 555);
+        this.checkBox_generateSymmetrical.Location = new Point(this.paddingX + 6, this.paddingY + 555);
+        this.checkBox_generateSymmetrical.Size = new Size(this.offsetX - this.paddingX - 6, 20);
+        this.checkBox_generateSymmetrical.Text = "Generate Symmetrical";
+        this.checkBox_generateSymmetrical.CheckedChanged += new System.EventHandler(this.CheckBox_generateSymmetrical_Click);
+        Controls.Add(this.checkBox_generateSymmetrical);
+
+        this.checkBox_showSteps.Location = new Point(this.paddingX + 6, this.paddingY + 575);
+        this.checkBox_showSteps.Size = new Size(this.offsetX - this.paddingX - 6, 20);
+        this.checkBox_showSteps.Text = "Render individual steps";
+        this.checkBox_showSteps.CheckedChanged += new System.EventHandler(this.CheckBox_showSteps_Click);
+        Controls.Add(this.checkBox_showSteps);
+
+        this.checkBox_allowSingleDegree.Location = new Point(this.paddingX + 6, this.paddingY + 595);
+        this.checkBox_allowSingleDegree.Size = new Size(this.offsetX - this.paddingX - 6, 20);
+        this.checkBox_allowSingleDegree.Text = "Allow points with single edge";
+        this.checkBox_allowSingleDegree.CheckedChanged += new System.EventHandler(this.CheckBox_allowSingleDegree_Click);
+        Controls.Add(this.checkBox_allowSingleDegree);
+
+        this.button_generate.Location = new Point(this.paddingX + 5, this.paddingY + 640);
         this.button_generate.Text = "Generate";
         this.button_generate.Click += new System.EventHandler(this.Button_generate_Click);
-        Controls.Add(button_generate);
+        Controls.Add(this.button_generate);
 
-        this.label_generate.Location = new Point(this.paddingX + 5, this.paddingY + 580);
-        this.label_generate.Size = new Size(this.offsetX - this.paddingX, 20);
-        Controls.Add(label_generate);
+        this.label_generate.Location = new Point(this.paddingX + 10, this.paddingY + 665);
+        this.label_generate.Size = new Size(this.offsetX - this.paddingX - 10, 20);
+        Controls.Add(this.label_generate);
     }
 
     #endregion
