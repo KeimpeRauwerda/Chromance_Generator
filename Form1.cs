@@ -125,7 +125,7 @@ public partial class Form1 : Form
         this.wallWidth = trackBar.Value;
         this.textBox_wallWidth.Text = trackBar.Value.ToString();
         
-        UpdateGrid();   
+        UpdateGrid();
         this.ResizeCanvas();
     }
     
@@ -150,6 +150,11 @@ public partial class Form1 : Form
         TrackBar trackBar = (TrackBar)sender;
         this.hubInnerWidth = trackBar.Value;
         this.textBox_hubInnerWidth.Text = trackBar.Value.ToString();
+        if (this.hubOuterWidth < this.hubInnerWidth + 1) {
+            this.hubOuterWidth = this.hubInnerWidth + 1;
+            this.trackbar_hubOuterWidth.Value = (int)(this.hubInnerWidth + 1);
+            this.textBox_hubOuterWidth.Text = (this.hubInnerWidth + 1).ToString();
+        }
         UpdateGrid();
         this.ResizeCanvas();
     }
@@ -160,6 +165,11 @@ public partial class Form1 : Form
         this.textBox_hubOuterWidth.Text = trackBar.Value.ToString();
         UpdateGrid();   
         this.ResizeCanvas();
+        if (this.hubOuterWidth - 1 < this.hubInnerWidth) {
+            this.hubInnerWidth = this.hubOuterWidth - 1;
+            this.trackbar_hubInnerWidth.Value = (int)(this.hubOuterWidth - 1);
+            this.textBox_hubInnerWidth.Text = (this.hubOuterWidth - 1).ToString();
+        }
     }
 
     private void Trackbar_minPoints_Scroll(object sender, EventArgs e) {

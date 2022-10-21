@@ -177,11 +177,11 @@ partial class Form1
         this.trackbar_profileLength.Value = (int)this.profileLength;
 
         this.trackbar_hubInnerWidth.Minimum = 1;
-        this.trackbar_hubInnerWidth.Maximum = 10;
+        this.trackbar_hubInnerWidth.Maximum = 9;
         this.trackbar_hubInnerWidth.SmallChange = 1;
         this.trackbar_hubInnerWidth.Value = (int)this.hubInnerWidth;
 
-        this.trackbar_hubOuterWidth.Minimum = 1;
+        this.trackbar_hubOuterWidth.Minimum = 2;
         this.trackbar_hubOuterWidth.Maximum = 10;
         this.trackbar_hubOuterWidth.SmallChange = 1;
         this.trackbar_hubOuterWidth.Value = (int)this.hubOuterWidth;

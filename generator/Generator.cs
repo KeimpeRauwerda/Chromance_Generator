@@ -238,7 +238,7 @@ public class HexagonGrid
             List<Point> r_adjacentPoints = r_validPoint.adjacentPoints.OrderBy(n => random.NextDouble()).ToList();
             if (r_adjacentPoints.Count == 0)
                 return (false, false);
-            Point r_adjacentPoint = r_adjacentPoints.First();
+            Point r_adjacentPoint = r_adjacentPoint = r_adjacentPoints.First();
             
             if (generateSymmetrical) {
                 bool foundValid = false;
@@ -248,7 +248,7 @@ public class HexagonGrid
                         r_adjacentPoint = adjacentPoint;
                         break;
                     }
-                    if (adjacentPoint.gridPosition.Y % 2 == 1 && !(r_adjacentPoint.gridPosition.X + 1 > (gridWidth + 1) / 2)) {
+                    if (adjacentPoint.gridPosition.Y % 2 == 1 && !(adjacentPoint.gridPosition.X + 1 > (gridWidth + 1) / 2)) {
                         foundValid = true;
                         r_adjacentPoint = adjacentPoint;
                         break;
